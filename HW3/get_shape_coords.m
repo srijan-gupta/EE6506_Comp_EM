@@ -1,11 +1,10 @@
-function [n_e, test_pt, strt_pt, normals] = get_shape_coords(a, da, n_sides)
-        %Assuming centred on origin, and a vertex on the +Y axis
+function [test_pt, strt_pt] = get_shape_coords(a, da, n_sides)
+
         ang = 360/n_sides;    
         c = a/(2*sind(ang/2));     %length of line segment connecting centre to vertex
         vrtx_A = [c*cosd(90-ang); c*sind(90-ang)];
         dir_AB = [-cosd(ang/2); sind(ang/2)];
-        rotat_ang = [cosd(ang) -sind(ang); sind(ang) cosd(ang)]; 
-        
+        rotat_ang = [cosd(ang) -sind(ang); sind(ang) cosd(ang)];         
         n_e = round(a/da);
  
         test_pt = zeros(2, n_sides*n_e);
@@ -16,8 +15,5 @@ function [n_e, test_pt, strt_pt, normals] = get_shape_coords(a, da, n_sides)
             test_pt(:,i:(i+n_e-1)) = rotat_ang*test_pt(:,i-n_e:i-1);
             strt_pt(:,i:(i+n_e-1)) = rotat_ang*strt_pt(:,i-n_e:i-1);
         end
-        
-        th_nm_deg = (90 - ang/2):ang:(90+(n_sides - 1.5)*ang);
-        normals = [cosd(th_nm_deg);sind(th_nm_deg)];
 end 
         

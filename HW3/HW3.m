@@ -12,13 +12,18 @@ tolrel = 1e-6;                %relative tolerance in integral
 
 % 2. Defining the variables 
 % 2.1. Related to the pentagon
+<<<<<<< HEAD
 [n_e, test_pt, strt_pt, normals] = get_shape_coords(a, da, 5);  
+=======
+[test_pt, strt_pt] = get_shape_coords(a,da, 5);  
+>>>>>>> 3c98b6c8418251c7c47f64448727a386bd32aa01
 figure;
 scatter(test_pt(1,:), test_pt(2,:))
 hold on
 scatter(strt_pt(1,:), strt_pt(2,:))
+axis equal;
 
-params = [k0, da, theta_i, a_ff, n_ff, tolabs, tolrel, n_e];
+params = [k0, da, theta_i, a_ff, n_ff, tolabs, tolrel];
 
 % 2.2. Far field points
 th_ff = 0:360/n_ff:(360-360/n_ff);
@@ -28,13 +33,19 @@ ff_pt = a_ff*[cosd(th_ff); sind(th_ff)];
 % For PEC, please set eps_r as Inf
 % 3.1. For PEC
 eps_r = Inf;
-fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, normals, params);
-RCS_PEC = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, normals, params);
+fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
+RCS_PEC = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, params);
 
 %3.2. For carbon fibre
+<<<<<<< HEAD
 eps_r = 12-5.5j;
 fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, normals, params);
 RCS_CF = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, normals, params);
+=======
+eps_r = 2;
+fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
+RCS_CF = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, params);
+>>>>>>> 3c98b6c8418251c7c47f64448727a386bd32aa01
 
 toc
 
