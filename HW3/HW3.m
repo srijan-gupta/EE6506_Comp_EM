@@ -12,7 +12,7 @@ tolrel = 1e-6;                %relative tolerance in integral
 
 % 2. Defining the variables 
 % 2.1. Related to the pentagon
-[n_e, test_pt, strt_pt, normals] = get_shape_coords(a,da, 4);  
+[n_e, test_pt, strt_pt, normals] = get_shape_coords(a, da, 5);  
 figure;
 scatter(test_pt(1,:), test_pt(2,:))
 hold on
@@ -32,7 +32,7 @@ fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, normals, params);
 RCS_PEC = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, normals, params);
 
 %3.2. For carbon fibre
-eps_r = 2;
+eps_r = 12-5.5j;
 fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, normals, params);
 RCS_CF = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, normals, params);
 
