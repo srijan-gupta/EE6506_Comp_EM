@@ -4,6 +4,7 @@ lambda = 1;
 k0 = 2*pi/lambda;
 a = 3*lambda;               %edge length of pentagon
 da = lambda/15;           %discretization length, please ensure that rem(a,da) = 0
+n_sides = 5;
 theta_i = 45*(pi/180); %angle of incidence
 a_ff = 4*lambda;          %far field radius
 n_ff = 180;                    %discretizations for far field
@@ -12,11 +13,7 @@ tolrel = 1e-6;                %relative tolerance in integral
 
 % 2. Defining the variables 
 % 2.1. Related to the pentagon
-<<<<<<< HEAD
-[n_e, test_pt, strt_pt, normals] = get_shape_coords(a, da, 5);  
-=======
-[test_pt, strt_pt] = get_shape_coords(a,da, 5);  
->>>>>>> 3c98b6c8418251c7c47f64448727a386bd32aa01
+[test_pt, strt_pt] = get_shape_coords(a,da, n_sides);  
 figure;
 scatter(test_pt(1,:), test_pt(2,:))
 hold on
@@ -37,15 +34,9 @@ fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
 RCS_PEC = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, params);
 
 %3.2. For carbon fibre
-<<<<<<< HEAD
 eps_r = 12-5.5j;
-fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, normals, params);
-RCS_CF = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, normals, params);
-=======
-eps_r = 2;
 fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
 RCS_CF = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, params);
->>>>>>> 3c98b6c8418251c7c47f64448727a386bd32aa01
 
 toc
 

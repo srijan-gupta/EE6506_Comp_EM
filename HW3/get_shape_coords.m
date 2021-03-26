@@ -1,5 +1,5 @@
 function [test_pt, strt_pt] = get_shape_coords(a, da, n_sides)
-
+        % Assuming centred on origin, one vertex on +Y axis
         ang = 360/n_sides;    
         c = a/(2*sind(ang/2));     %length of line segment connecting centre to vertex
         vrtx_A = [c*cosd(90-ang); c*sind(90-ang)];
