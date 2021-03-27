@@ -4,6 +4,7 @@ lambda = 1;
 k0 = 2*pi/lambda;
 a = 3*lambda;               %edge length of pentagon
 da = lambda/15;           %discretization length, please ensure that rem(a,da) = 0
+n_sides = 5;
 theta_i = 45*(pi/180); %angle of incidence
 a_ff = 4*lambda;          %far field radius
 n_ff = 180;                    %discretizations for far field
@@ -12,7 +13,7 @@ tolrel = 1e-6;                %relative tolerance in integral
 
 % 2. Defining the variables 
 % 2.1. Related to the pentagon
-[test_pt, strt_pt] = get_shape_coords(a,da,5);  
+[test_pt, strt_pt] = get_shape_coords(a,da, n_sides);  
 figure;
 scatter(test_pt(1,:), test_pt(2,:))
 hold on
