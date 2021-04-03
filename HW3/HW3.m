@@ -46,5 +46,8 @@ title('RCS for PEC')
 figure;
 polarplot(th_ff*pi/180, RCS_CF);
 title('RCS for carbon fibre')
+figure;
+polarplot(th_ff*pi/180, sqrt(RCS_CF));
+title('sqrt(RCS) for carbon fibre')
 
 

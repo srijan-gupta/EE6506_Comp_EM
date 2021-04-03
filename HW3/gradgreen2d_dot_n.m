@@ -9,5 +9,5 @@ function grad_g_dot_n = gradgreen2d_dot_n(k, r_p, r0, Dr, d, n_hat)
         norm_R = sqrt( R_x.^2 + R_y.^2 );
         hat_R_dot_n = (n_hat(1).*R_x + n_hat(2).*R_y)./norm_R;
 
-        grad_g_dot_n = 1j*k/4*besselh(1, 2, k.*norm_R).*hat_R_dot_n;
+        grad_g_dot_n = -1j*k/4*besselh(1, 2, k.*norm_R).*hat_R_dot_n;
 end

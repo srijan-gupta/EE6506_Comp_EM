@@ -28,37 +28,37 @@ ff_pt = a_ff*[cosd(th_ff); sind(th_ff)];
 
 % 3. Calculating RCS
 eps_r = 4;
-fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, normals, params);
-% n = length(test_pt);
-% strt_pt2 = strt_pt;
-% strt_pt2(:,end+1) = strt_pt2(:,1); %for ease while calculating Dr for the last starting point
-% A = zeros(2*n, 2*n);
-% b = zeros(2*n,1);
-% for i = 1:n
-%     for j = 1:n
-%         Dr = strt_pt2(:,j+1) - strt_pt2(:,j);
-%         t_hat = Dr/norm(Dr);
-%         n_hat = [-t_hat(2), t_hat(1)];
-%         if i==j
-%             A(i, j)  = 2*integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
-%             A(i+n, j)= 2*integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
-%         else
-%             A(i, j)     = integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);            %The g1 term
-%             A(i+n, j)   = integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);%The g2 term
-%             A(i, j+n)   = -1*integral(@(d)gradgreen2d_dot_n(k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);            %The grad(g1).n term
-%             A(i+n, j+n) = -1*integral(@(d)gradgreen2d_dot_n(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);%The grad(g2).n term
-%         end
-%     end
-%     b(i) = inc_field(test_pt(:,i), theta_i, k0);
-% end
-% A = da*A; %scaling by the length of the segment since the integral iterated over d from 0 to 1
-% fields_bndry = A\b;
-RCS = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, params);
+fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
+%  n = length(test_pt);
+%  strt_pt2 = strt_pt;
+%  strt_pt2(:,end+1) = strt_pt2(:,1); %for ease while calculating Dr for the last starting point
+%  A = zeros(2*n, 2*n);
+%  b = zeros(2*n,1);
+%  for i = 1:n
+%      for j = 1:n
+%          Dr = strt_pt2(:,j+1) - strt_pt2(:,j);
+%          t_hat = Dr/norm(Dr);
+%          n_hat = [-t_hat(2), t_hat(1)];
+%          if i==j
+%              A(i, j)  = 2*integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
+%              A(i+n, j)= 2*integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
+%          else
+%              A(i, j)     = integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);            %The g1 term
+%              A(i+n, j)   = integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);%The g2 term
+%              A(i, j+n)   = -1*integral(@(d)gradgreen2d_dot_n(k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);            %The grad(g1).n term
+%              A(i+n, j+n) = -1*integral(@(d)gradgreen2d_dot_n(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);%The grad(g2).n term
+%          end
+%      end
+%      b(i) = inc_field(test_pt(:,i), theta_i, k0);
+%  end
+%  A = da*A; %scaling by the length of the segment since the integral iterated over d from 0 to 1
+%  fields_bndry = A\b;
+ RCS = get_RCS(eps_r, fields_bndry, ff_pt, strt_pt, params);
 
 toc
 
 figure;
-polarplot(th_ff*pi/180, sqrt(RCS));
+polarplot(th_ff*pi/180, sqrt(RCS/(pi*a_ff)));
 title(['sqrt(RCS) for n_sides = ',num2str(n_sides),', eps_r = ',num2str(eps_r)])
 
 
