@@ -1,4 +1,4 @@
-function x = solve_on_boundary(eps_r, test_pt, strt_pt, params)
+function x = solve_on_boundary(eps_r, test_pt, strt_pt, params, a_sc)
 
         [k0, da, theta_i, ~, ~, tolabs, tolrel] = feval (@(x) x{:} , num2cell(params));         
         n = length(test_pt);
@@ -26,8 +26,10 @@ function x = solve_on_boundary(eps_r, test_pt, strt_pt, params)
                     if i==j
                          A(i, j)  = 1*integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
                          A(i+n, j)= 1*integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
-                         A(i,j+n) = 0.5;
-                         A(i+n,j+n) = -0.5;
+                         A(i,j+n) = 0.5 -1*integral(@(d)gradgreen2d_dot_n(k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.0,0.5-a_sc,'AbsTol',tolabs,'RelTol',tolrel)...
+                             -1*integral(@(d)gradgreen2d_dot_n(k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.5+a_sc,1,'AbsTol',tolabs,'RelTol',tolrel);
+                         A(i+n,j+n) = -0.5 -1*integral(@(d)gradgreen2d_dot_n(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.0,0.5-a_sc,'AbsTol',tolabs,'RelTol',tolrel)...
+                             -1*integral(@(d)gradgreen2d_dot_n(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d, n_hat),0.5+a_sc,1,'AbsTol',tolabs,'RelTol',tolrel);
                     else
                          A(i, j)     = integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);            %The g1 term
                          A(i+n, j)   = integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);%The g2 term
