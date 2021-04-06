@@ -5,7 +5,8 @@ k0 = 2*pi/lambda;
 n_sides = 90;
 a = 0.0698*lambda;               %edge length of pentagon
 da = 0.0698*lambda;           %discretization length, please ensure that rem(a,da) = 0
-theta_i = 0*(pi/180); %angle of incidence
+theta_i_deg = 45;
+theta_i = theta_i_deg*(pi/180); %angle of incidence
 a_ff = 4*lambda;          %far field radius
 n_ff = 180;                    %discretizations for far field
 tolabs = 1e-9;               %absolute tolerance in integral
@@ -13,7 +14,7 @@ tolrel = 1e-6;                %relative tolerance in integral
 
 % 2. Defining the variables 
 % 2.1. Related to the pentagon
-[test_pt, strt_pt] = get_shape_coords(a, da, n_sides);  
+[test_pt, strt_pt] = get_shape_coords(a, da, n_sides,theta_i_deg);  
 figure;
 scatter(test_pt(1,:), test_pt(2,:))
 hold on
@@ -40,8 +41,8 @@ fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
 %          t_hat = Dr/norm(Dr);
 %          n_hat = [-t_hat(2), t_hat(1)];
 %          if i==j
-%              A(i, j)  = 2*integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
-%              A(i+n, j)= 2*integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
+%              A(i, j)  = 1*integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
+%              A(i+n, j)= 1*integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);
 %          else
 %              A(i, j)     = integral(@(d)green2d(k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);            %The g1 term
 %              A(i+n, j)   = integral(@(d)green2d(sqrt(eps_r)*k0, test_pt(:,i), strt_pt(:,j), Dr, d),0.0,1,'AbsTol',tolabs,'RelTol',tolrel);%The g2 term
@@ -59,6 +60,6 @@ toc
 
 figure;
 polarplot(th_ff*pi/180, sqrt(RCS/(pi*a_ff)));
-title(['sqrt(RCS) for n_sides = ',num2str(n_sides),', eps_r = ',num2str(eps_r)])
+title(['sqrt(RCS) for n_sides = ',num2str(n_sides),', eps_r = ',num2str(eps_r)]);
 
 

@@ -1,11 +1,12 @@
 tic
 % 1. Defining the parameters
-lambda = 1;
+lambda = 0.1;
 k0 = 2*pi/lambda;
 a = 3*lambda;               %edge length of pentagon
 da = lambda/15;           %discretization length, please ensure that rem(a,da) = 0
 n_sides = 5;
-theta_i = 45*(pi/180); %angle of incidence
+theta_i_deg = 45;
+theta_i = theta_i_deg*(pi/180); %angle of incidence
 a_ff = 4*lambda;          %far field radius
 n_ff = 180;                    %discretizations for far field
 tolabs = 1e-9;               %absolute tolerance in integral
@@ -13,7 +14,7 @@ tolrel = 1e-6;                %relative tolerance in integral
 
 % 2. Defining the variables 
 % 2.1. Related to the pentagon
-[test_pt, strt_pt] = get_shape_coords(a,da, n_sides);  
+[test_pt, strt_pt] = get_shape_coords(a, da, n_sides, theta_i_deg);  
 figure;
 scatter(test_pt(1,:), test_pt(2,:))
 hold on
