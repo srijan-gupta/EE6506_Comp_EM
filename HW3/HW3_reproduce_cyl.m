@@ -28,8 +28,8 @@ th_ff = 0:360/n_ff:(360-360/n_ff);
 ff_pt = a_ff*[cosd(th_ff); sind(th_ff)];
 
 % 3. Calculating RCS
-eps_r = 4;
-fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params);
+eps_r = 1;
+fields_bndry = solve_on_boundary(eps_r, test_pt, strt_pt, params,tolrel);
 %  n = length(test_pt);
 %  strt_pt2 = strt_pt;
 %  strt_pt2(:,end+1) = strt_pt2(:,1); %for ease while calculating Dr for the last starting point
