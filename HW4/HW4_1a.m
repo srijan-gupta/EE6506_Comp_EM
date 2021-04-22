@@ -3,7 +3,7 @@ global k0;
 k0 = 2*pi / lambda;
 n = 7;
 seq =1;
-eps_n = 3.5;
+eps_n = 3.5*3.5;
 air_thickness = 1.5;
 
 eps_arr = get_multilayer_eps(seq, n, eps_n);
@@ -14,7 +14,7 @@ tou = @(eps1, eps2) 2*eps1 ./ (eps1 + eps2);
 ref = @(eps1, eps2)  (eps1 - eps2) ./ (eps1 + eps2); 
 
 I_mat  =@(t,r) (1/t) .* [1 r; r 1;];
-delta = @(eps,wid) 2*pi*k0*eps*wid;
+delta = @(eps,wid) k0*sqrt(eps)*wid;
 P_mat = @(delta) [exp(1i*delta) 0; 0 exp(-1i*delta)];
 
 T_mat = I_mat( tou(1, eps_arr(1)), ref(1, eps_arr(1)) );
