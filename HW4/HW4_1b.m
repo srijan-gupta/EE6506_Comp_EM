@@ -2,14 +2,14 @@ tic
 
 n_layers = 3;
 seq =1;
-eps_r = 2.4^2; %relative permitivitty
+eps_r = 1.4^2; %relative permitivitty
 n = eps_r^0.5; %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 
-num_pts = 100;
+num_pts = 1000;
 
-k_vec = 0:pi/10:pi;
+k_vec = 0:pi/100:pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -18,6 +18,7 @@ global wid_arr DL
 
 n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
 wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+wid_arr([1 end]) = 10;
 len = size(n_obj_arr');
 
 DL = sum(wid_arr)/(num_pts-1);
@@ -39,7 +40,7 @@ intN2N2 = @(x1, x2) (x2^3-x1^3)/(3*DLsq);
 for k_id = 1:len_vec
     
     k = k_vec(k_id);
-    Uin = @(x) exp(-1j*k*x);
+    Uin = @(x) exp(-1j*k.*x);
     
     alpha_in = -1j*k;
     alpha = @(n) 1j*k*n;
@@ -102,6 +103,19 @@ xticklabels(strcat(string(k_vec(1:100:len_vec)./pi), '\pi'))
 xlabel('k')
 hold off;
 legend("transmission","reflection");
+
+x_arr = 0:DL:sum(wid_arr);
+Uin_arr = Uin(x_arr);
+figure
+hold on
+plot(x_arr, abs(U))
+plot(x_arr, abs(Uin_arr))
+plot(x_arr, abs(U'-Uin_arr))
+plot(x_arr, real(U))
+plot(x_arr, real(Uin_arr))
+plot(x_arr, real(U'-Uin_arr))
+plot(x_arr, n_node_arr)
+legend('abs(U)','abs(Uin)','abs(Us)','Re(U)','Re(Uin)','Re(Us)', 'refr. index')
 
 function frac_k1 = k1k2split(i, n1, n2, id_obj)
     global wid_arr DL
