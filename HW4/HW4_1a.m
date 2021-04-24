@@ -3,6 +3,7 @@ n = 7;
 seq =1;
 eps_n = 12.25;
 air_thickness = 1;
+ratio = ((sqrt(5) + 1)/2);
         
 lambda_range = [0.5*lambda_ref : 0.01*lambda_ref : 1.5*lambda_ref];
 tou_arr = [];
@@ -13,7 +14,7 @@ for lambda = lambda_range
         k0 = 2*pi / lambda;
 
         eps_arr = get_multilayer_eps(seq, n, eps_n);
-        wid_arr = get_width(eps_arr, air_thickness);
+        wid_arr = get_width(eps_arr, air_thickness, ratio);
         len = size(eps_arr');
 
         tou = @(eps1, eps2) 2*eps1 ./ (eps1 + eps2); 

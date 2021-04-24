@@ -4,6 +4,8 @@ n = 7;
 seq =1;
 eps_n = 2.4^2; %relative permitivitty
 air_thickness = 1;
+ratio = ((sqrt(5) + 1)/2);
+
 
 k_vec = 0:pi/1000:pi;
 len_vec = length(k_vec);
@@ -11,7 +13,7 @@ tou_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
 
 eps_arr = get_multilayer_eps(seq, n, eps_n);
-wid_arr = get_width(eps_arr, air_thickness);
+wid_arr = get_width(eps_arr, air_thickness, ratio);
 len = size(eps_arr');
 
 tou = @(eps1, eps2) 2*eps1 ./ (eps1 + eps2); 
