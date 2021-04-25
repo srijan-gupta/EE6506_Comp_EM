@@ -52,8 +52,8 @@ for k_id = 1:len_vec
     id_obj = 1;
     
     n = n_node_arr(1);
-    A(1,1) = 1/DL + (k*n)^2*intN1N1(0,DL) + alpha(n);
-    A(1,2) = -1/DL + (k*n)^2*intN1N2(0,DL);
+    A(1,1) = 1/DL - (k*n)^2*intN1N1(0,DL) + alpha(n);
+    A(1,2) = -1/DL - (k*n)^2*intN1N2(0,DL);
     b(1) = -(alpha_in - alpha(n));
     
     f = 1;
@@ -63,27 +63,27 @@ for k_id = 1:len_vec
         n_ip1 = n_node_arr(i+1);
         
         %A(i,i-1)
-        A(i,i-1) = -1/DL + (k*n_im1)^2*intN1N2(0,f*DL) + (k*n_i)^2*intN1N2(f*DL,DL);
+        A(i,i-1) = -1/DL - (k*n_im1)^2*intN1N2(0,f*DL) - (k*n_i)^2*intN1N2(f*DL,DL);
         
         %A(i,i):
-        int1 = (k*n_im1)^2*intN2N2(0,f*DL) + (k*n_i)^2*intN2N2(f*DL,DL);
+        int1 = -(k*n_im1)^2*intN2N2(0,f*DL) - (k*n_i)^2*intN2N2(f*DL,DL);
         
         if (i-1)*DL > sum(wid_arr(1:id_obj))
             id_obj = id_obj+1;
         end
         f = k1k2split(i, n_i, n_ip1, id_obj);
         
-        int2 = (k*n_i)^2*intN1N1(0,f*DL) + (k*n_ip1)^2*intN2N2(f*DL,DL);
+        int2 = -(k*n_i)^2*intN1N1(0,f*DL) - (k*n_ip1)^2*intN2N2(f*DL,DL);
         A(i,i) = 2/DL + int1 + int2;
         
         %A(i,i+1)
-        A(i,i+1) = -1/DL + (k*n_i)^2*intN1N2(0,f*DL) + (k*n_ip1)^2*intN1N2(f*DL,DL);
+        A(i,i+1) = -1/DL - (k*n_i)^2*intN1N2(0,f*DL) - (k*n_ip1)^2*intN1N2(f*DL,DL);
     
     end
     
     n = n_node_arr(end);
-    A(num_pts,num_pts-1) = -1/DL + (k*n)^2*intN1N2(0,DL);
-    A(num_pts,num_pts) = 1/DL + (k*n)^2*intN2N2(0,DL) - alpha(n);
+    A(num_pts,num_pts-1) = -1/DL - (k*n)^2*intN1N2(0,DL);
+    A(num_pts,num_pts) = 1/DL - (k*n)^2*intN2N2(0,DL) - alpha(n);
     b(end) = (alpha_in - alpha(n));
     
     U = A\b;
