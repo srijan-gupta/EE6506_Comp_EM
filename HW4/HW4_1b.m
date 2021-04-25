@@ -84,7 +84,7 @@ for k_id = 1:len_vec
     n = n_node_arr(end);
     A(num_pts,num_pts-1) = -1/DL + (k*n)^2*intN1N2(0,DL);
     A(num_pts,num_pts) = 1/DL + (k*n)^2*intN2N2(0,DL) - alpha(n);
-    b(end) = -(alpha_in - alpha(n));
+    b(end) = (alpha_in - alpha(n));
     
     U = A\b;
     
