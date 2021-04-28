@@ -2,12 +2,11 @@ tic
 
 n = 7;
 seq =1;
-eps_n = 2.4^2; %relative permitivitty
+eps_n = 1.5^2; %relative permitivitty
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 
-
-k_vec = 0:pi/1000:pi;
+k_vec = 0:2*pi/10000:2*pi;
 len_vec = length(k_vec);
 tou_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -46,8 +45,8 @@ figure;
 hold on;
 plot(k_vec, tou_arr);
 plot(k_vec, ref_arr);
-xticks(k_vec(1:100:len_vec))
-xticklabels(strcat(string(k_vec(1:100:len_vec)./pi), '\pi'))
+xticks(k_vec(1:fix(len_vec/10):len_vec))
+xticklabels(strcat(string(k_vec(1:fix(len_vec/10):len_vec)./pi), '\pi'))
 xlabel('k')
 hold off;
 legend("transmission","reflection");
