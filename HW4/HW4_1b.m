@@ -7,9 +7,9 @@ n = eps_r^0.5; %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 
-num_pts = 1000;
+num_pts = 5000;
 
-k_vec = 0:pi/100:pi;
+k_vec = 0:2*pi/1000:2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -115,36 +115,36 @@ z_arr = 0:DL:sum(wid_arr);
 Uin_arr = Uin(z_arr);
 Us = U'-Uin_arr;
 
-cmu_Hin_arr = Uin_arr;
-cmu_H_arr = zeros(1,num_pts);
-cmu_H_arr(1) = (1j/k)*(U(2)' - U(1)')/DL;
-cmu_H_arr(2:end-1) = (1j/k)*(U(3:end)' - U(1:end-2)')/(2*DL);
-cmu_H_arr(end) = (1j/k)*(U(end)' - U(end-1)')/DL;
-cmu_Hs_arr = cmu_H_arr - cmu_Hin_arr;
-
-Sin_arr = 0.5*real(Uin_arr.*conj(cmu_Hin_arr));
-S_arr = 0.5*real(U'.*conj(cmu_H_arr));
-Ss_arr = 0.5*real(Us.*conj(cmu_Hs_arr));
+% cmu_Hin_arr = Uin_arr;
+% cmu_H_arr = zeros(1,num_pts);
+% cmu_H_arr(1) = (1j/k)*(U(2)' - U(1)')/DL;
+% cmu_H_arr(2:end-1) = (1j/k)*(U(3:end)' - U(1:end-2)')/(2*DL);
+% cmu_H_arr(end) = (1j/k)*(U(end)' - U(end-1)')/DL;
+% cmu_Hs_arr = cmu_H_arr - cmu_Hin_arr;
+% 
+% Sin_arr = 0.5*real(Uin_arr.*conj(cmu_Hin_arr));
+% S_arr = 0.5*real(U'.*conj(cmu_H_arr));
+% Ss_arr = 0.5*real(Us.*conj(cmu_Hs_arr));
 
 figure
 hold on
-%plot(x_arr, abs(U))
-%plot(x_arr, abs(Uin_arr))
-%plot(x_arr, abs(U'-Uin_arr))
+plot(x_arr, abs(U))
+plot(x_arr, abs(Uin_arr))
+plot(x_arr, abs(U'-Uin_arr))
 plot(z_arr, real(U))
 plot(z_arr, real(Uin_arr))
 plot(z_arr, real(Us))
 plot(z_arr, n_node_arr,'.')
 plot(z_arr, id_obj_arr,'.')
-legend('Re(U)','Re(Uin)','Re(Us)', 'refr. index', 'id_obj')%'abs(U)','abs(Uin)','abs(Us)',
+legend('abs(U)','abs(Uin)','abs(Us)','Re(U)','Re(Uin)','Re(Us)', 'refr. index', 'id_obj')
 
-figure
-hold on
-plot(z_arr, S_arr);
-plot(z_arr, Sin_arr);
-plot(z_arr, Ss_arr);
-plot(z_arr, n_node_arr)
-legend('S','Sin','Ss', 'refr. index')
+% figure
+% hold on
+% plot(z_arr, S_arr);
+% plot(z_arr, Sin_arr);
+% plot(z_arr, Ss_arr);
+% plot(z_arr, n_node_arr)
+% legend('S','Sin','Ss', 'refr. index')
 
 function frac_k1 = k1k2split(i, n1, n2, id_obj)
     global wid_arr DL
