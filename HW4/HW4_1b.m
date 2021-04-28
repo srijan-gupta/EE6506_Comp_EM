@@ -10,7 +10,7 @@ ratio = ((sqrt(5) + 1)/2);
 num_pts = 5000;
 
 %k_vec = 0:2*pi/1000:2*pi;
-k_vec = 2*pi;
+k_vec = pi:pi/100:2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -96,8 +96,8 @@ for k_id = 1:len_vec
     
     U = A\b;
     
-    ref_arr(k_id) = sum(abs(U(1:10)'-Uin(0:DL:9*DL)))/10;
-    tau_arr(k_id) = sum(abs(U(end-9:end)))/10;
+    ref_arr(k_id) = sum(abs(U(1:10)'-Uin(0:DL:9*DL)).^2)/10;
+    tau_arr(k_id) = sum(abs(U(end-9:end)).^2)/10;
 end
 
 toc
