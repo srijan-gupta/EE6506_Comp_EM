@@ -10,7 +10,7 @@ ratio = ((sqrt(5) + 1)/2);
 num_pts = 5000;
 
 %k_vec = 0:2*pi/1000:2*pi;
-k_vec = 2*pi;
+k_vec = pi:pi/100:2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -19,7 +19,7 @@ global wid_arr DL
 
 n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
 wid_arr = get_width(n_obj_arr, air_thickness, ratio);
-wid_arr([1 end]) = 10;
+wid_arr([1 end]) = 2;
 len = size(n_obj_arr');
 
 DL = sum(wid_arr)/(num_pts-1);
@@ -94,10 +94,10 @@ for k_id = 1:len_vec
     
     id_obj_arr(end) = id_obj;
     
-    U = A\b;
+    U = (A\b)';
     
-    ref_arr(k_id) = sum(abs(U(1:10)'-Uin(0:DL:9*DL)))/10;
-    tau_arr(k_id) = sum(abs(U(end-9:end)))/10;
+    ref_arr(k_id) = sum(abs(U(1:10)-Uin(0:DL:9*DL)).^2)/10;
+    tau_arr(k_id) = sum(abs(U(end-9:end)).^2)/10;
 end
 
 toc
@@ -114,38 +114,52 @@ legend("transmission","reflection");
 
 z_arr = 0:DL:sum(wid_arr);
 Uin_arr = Uin(z_arr);
-Us = U'-Uin_arr;
+Us = U-Uin_arr;
 
-% cmu_Hin_arr = Uin_arr;
-% cmu_H_arr = zeros(1,num_pts);
-% cmu_H_arr(1) = (1j/k)*(U(2)' - U(1)')/DL;
-% cmu_H_arr(2:end-1) = (1j/k)*(U(3:end)' - U(1:end-2)')/(2*DL);
-% cmu_H_arr(end) = (1j/k)*(U(end)' - U(end-1)')/DL;
-% cmu_Hs_arr = cmu_H_arr - cmu_Hin_arr;
-% 
-% Sin_arr = 0.5*real(Uin_arr.*conj(cmu_Hin_arr));
-% S_arr = 0.5*real(U'.*conj(cmu_H_arr));
-% Ss_arr = 0.5*real(Us.*conj(cmu_Hs_arr));
+cmu_Hin_arr = Uin_arr;
+cmu_H_arr = zeros(1,num_pts);
+cmu_H_arr(1) = (1j/k)*(U(2) - U(1))/DL; % c/omega = k
+cmu_H_arr(2:end-1) = (1j/k)*(U(3:end) - U(1:end-2))/(2*DL);
+cmu_H_arr(end) = (1j/k)*(U(end) - U(end-1))/DL;
+cmu_Hs_arr = cmu_H_arr - cmu_Hin_arr;
+
+Sin_arr = 0.5*real(Uin_arr.*conj(cmu_Hin_arr));
+S_arr = 0.5*real(U.*conj(cmu_H_arr));
+Ss_arr = 0.5*real(Us.*conj(cmu_Hs_arr));
+
+Xin_arr = 0.5*imag(Uin_arr.*conj(cmu_Hin_arr));
+X_arr = 0.5*imag(U.*conj(cmu_H_arr));
+Xs_arr = 0.5*imag(Us.*conj(cmu_Hs_arr));
 
 figure
+subplot(2,1,1)
 hold on
 plot(z_arr, abs(U))
 plot(z_arr, abs(Uin_arr))
-plot(z_arr, abs(U'-Uin_arr))
-plot(z_arr, real(U))
-plot(z_arr, real(Uin_arr))
-plot(z_arr, real(Us))
+plot(z_arr, abs(Us))
 plot(z_arr, n_node_arr,'.')
 %plot(z_arr, id_obj_arr,'.')
-legend('abs(U)','abs(Uin)','abs(Us)','Re(U)','Re(Uin)','Re(Us)', 'refr. index') %, 'id_obj'
+legend('abs(U)','abs(Uin)','abs(Us)', 'refr. index') %, 'id_obj'
 
-% figure
-% hold on
-% plot(z_arr, S_arr);
-% plot(z_arr, Sin_arr);
-% plot(z_arr, Ss_arr);
-% plot(z_arr, n_node_arr)
-% legend('S','Sin','Ss', 'refr. index')
+subplot(2,1,2)
+hold on
+plot(z_arr, angle(U))
+plot(z_arr, angle(Uin_arr))
+plot(z_arr, angle(Us))
+plot(z_arr, n_node_arr,'.')
+%plot(z_arr, id_obj_arr,'.')
+legend('phase(U)','phase(Uin)','phase(Us)', 'refr. index')
+
+figure
+hold on
+plot(z_arr, S_arr);
+plot(z_arr, Sin_arr);
+plot(z_arr, Ss_arr);
+plot(z_arr, X_arr);
+plot(z_arr, Xin_arr);
+plot(z_arr, Xs_arr);
+plot(z_arr, n_node_arr)
+legend('S','Sin','Ss', 'X','Xin','Xs', 'refr. index')
 
 function frac_k1 = k1k2split(i, n1, n2, id_obj)
     global wid_arr DL
