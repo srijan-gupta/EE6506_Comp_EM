@@ -9,7 +9,8 @@ ratio = ((sqrt(5) + 1)/2);
 
 num_pts = 5000;
 
-k_vec = 0:2*pi/1000:2*pi;
+%k_vec = 0:2*pi/1000:2*pi;
+k_vec = 2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -128,15 +129,15 @@ Us = U'-Uin_arr;
 
 figure
 hold on
-plot(x_arr, abs(U))
-plot(x_arr, abs(Uin_arr))
-plot(x_arr, abs(U'-Uin_arr))
+plot(z_arr, abs(U))
+plot(z_arr, abs(Uin_arr))
+plot(z_arr, abs(U'-Uin_arr))
 plot(z_arr, real(U))
 plot(z_arr, real(Uin_arr))
 plot(z_arr, real(Us))
 plot(z_arr, n_node_arr,'.')
-plot(z_arr, id_obj_arr,'.')
-legend('abs(U)','abs(Uin)','abs(Us)','Re(U)','Re(Uin)','Re(Us)', 'refr. index', 'id_obj')
+%plot(z_arr, id_obj_arr,'.')
+legend('abs(U)','abs(Uin)','abs(Us)','Re(U)','Re(Uin)','Re(Us)', 'refr. index') %, 'id_obj'
 
 % figure
 % hold on
