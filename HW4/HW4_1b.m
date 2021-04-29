@@ -60,12 +60,17 @@ for k_id = 1:len_vec
     A(1,2) = -1/DL - (k*n)^2*intN1N2(0,DL);
     b(1) = -(alpha_in - alpha(n));
     
+    f_arr = zeros(1,num_pts);
     f = 1;
+    f_arr(1) = f;
     for i = 2:(num_pts-1)
         n_im1 = n_node_arr(i-1);
         n_i   = n_node_arr(i);
         n_ip1 = n_node_arr(i+1);
         
+        if n_i ~= n_im1
+            id_obj = id_obj+1;
+        end
         id_obj_arr(i) = id_obj;
         
         %A(i,i-1)
@@ -74,10 +79,8 @@ for k_id = 1:len_vec
         %A(i,i):
         int1 = -(k*n_im1)^2*intN2N2(0,f*DL) - (k*n_i)^2*intN2N2(f*DL,DL);
         
-        if n_ip1 ~= n_i
-            id_obj = id_obj+1;
-        end
         f = k1k2split(i, n_i, n_ip1, id_obj);
+        f_arr(i) = f;
         
         int2 = -(k*n_i)^2*intN1N1(0,f*DL) - (k*n_ip1)^2*intN2N2(f*DL,DL);
         A(i,i) = 2/DL + int1 + int2;
@@ -96,8 +99,8 @@ for k_id = 1:len_vec
     
     U = (A\b)';
     
-    ref_arr(k_id) = sum(abs(U(1:10)-Uin(0:DL:9*DL)).^2)/10;
-    tau_arr(k_id) = sum(abs(U(end-9:end)).^2)/10;
+    ref_arr(k_id) = sum(abs(U(1:10)-Uin(0:DL:9*DL)))/10;
+    tau_arr(k_id) = sum(abs(U(end-9:end)))/10;
 end
 
 toc
@@ -132,23 +135,44 @@ X_arr = 0.5*imag(U.*conj(cmu_H_arr));
 Xs_arr = 0.5*imag(Us.*conj(cmu_Hs_arr));
 
 figure
-subplot(2,1,1)
+hold on
+plot(z_arr, n_node_arr, '.')
+plot(z_arr, id_obj_arr,'.')
+plot(z_arr, 10*f_arr,'.')
+legend('n','id_obj','10*f')
+
+figure
+subplot(2,2,1)
 hold on
 plot(z_arr, abs(U))
 plot(z_arr, abs(Uin_arr))
 plot(z_arr, abs(Us))
-plot(z_arr, n_node_arr,'.')
-%plot(z_arr, id_obj_arr,'.')
-legend('abs(U)','abs(Uin)','abs(Us)', 'refr. index') %, 'id_obj'
+plot(z_arr, n_node_arr)
+legend('abs(U)','abs(Uin)','abs(Us)', 'refr. index')
 
-subplot(2,1,2)
+subplot(2,2,3)
 hold on
 plot(z_arr, unwrap(angle(U)));
 plot(z_arr, unwrap(angle(Uin_arr)));
 plot(z_arr, unwrap(angle(Us)));
-plot(z_arr, n_node_arr,'.')
-%plot(z_arr, id_obj_arr,'.')
+plot(z_arr, n_node_arr)
 legend('phase(U)','phase(Uin)','phase(Us)', 'refr. index')
+
+subplot(2,2,2)
+hold on
+plot(z_arr, abs(cmu_H_arr))
+plot(z_arr, abs(cmu_Hin_arr))
+plot(z_arr, abs(cmu_Hs_arr))
+plot(z_arr, n_node_arr)
+legend('abs(c\muH)','abs(c\muHin)','abs(c\muHs)', 'refr. index')
+
+subplot(2,2,4)
+hold on
+plot(z_arr, unwrap(angle(cmu_H_arr)));
+plot(z_arr, unwrap(angle(cmu_Hin_arr)));
+plot(z_arr, unwrap(angle(cmu_Hs_arr)));
+plot(z_arr, n_node_arr)
+legend('phase(c\muH)','phase(c\muHin)','phase(c\muHs)', 'refr. index')
 
 figure
 subplot(2,1,1)
@@ -174,12 +198,12 @@ function frac_k1 = k1k2split(i, n1, n2, id_obj)
         frac_k1 = 1;
     else
         wid_1 = sum(wid_arr(1:id_obj));
-        wid_2 = DL*i;
+        wid_2 = DL*((i-1) + 1);
         excess = wid_2 - wid_1;
         if excess>DL
             disp("excess width is more than permissible")
         else
-            frac_k1 = excess/DL;
+            frac_k1 = 1 - excess/DL;
         end
     end
 end
