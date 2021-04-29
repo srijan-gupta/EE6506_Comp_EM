@@ -17,10 +17,12 @@ ref_arr = zeros(1,len_vec);
 
 global wid_arr DL
 
-n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
-wid_arr = get_width(n_obj_arr, air_thickness, ratio);
-wid_arr([1 end]) = 2;
-len = size(n_obj_arr');
+%n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
+%wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+%wid_arr([1 end]) = 2;
+
+n_obj_arr = [1 1.5];
+wid_arr = [4 4];
 
 DL = sum(wid_arr)/(num_pts-1);
 n_node_arr = zeros(1,num_pts);

@@ -1,0 +1,140 @@
+tic
+
+n_layers = 2;
+seq =1;
+eps_r = 1.5^2; %relative permitivitty
+n = eps_r^0.5; %refractive index
+air_thickness = 1;
+ratio = ((sqrt(5) + 1)/2);
+k_max = 2*pi;
+k_min = pi;
+num_pts_per_lyr = 3;
+
+DL1 = air_thickness/(num_pts_per_lyr-1);
+DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
+
+%k_vec = 0:2*pi/1000:2*pi;
+k_vec = 2*pi;
+len_vec = length(k_vec);
+tau_arr = zeros(1,len_vec);
+ref_arr = zeros(1,len_vec);
+
+n_obj_arr = [1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1];
+wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+wid_arr([1 2 (end-1) end]) = air_thickness;
+
+%n_obj_arr = [1 1.5];
+%wid_arr = [4 4];
+
+num_objs = length(n_obj_arr);
+n_obj_eff_arr = [n_obj_arr(1)];
+wid_eff_arr = [wid_arr(1)];
+for i = 2:num_objs
+    if n_obj_arr(i) == n_obj_arr(i-1)
+        wid_eff_arr(end) = wid_eff_arr(end) + wid_arr(i);
+    else
+        n_obj_eff_arr(end+1) = n_obj_arr(i);
+        wid_eff_arr(end+1) = wid_arr(i);
+    end
+end
+
+
+num_objs_eff = length(n_obj_eff_arr);
+num_pts_each_layer = zeros(1,num_objs_eff);
+z_arr = 0:DL1:wid_eff_arr(1);
+disp(z_arr)
+for i = 1:num_objs_eff
+    if n_obj_eff_arr(i) == 1
+        num_pts_each_layer(i) = fix(wid_eff_arr(i)/DL1) + 1;
+        if i>1
+            z_arr = [z_arr, sum(wid_eff_arr(1:i-1)):DL1:sum(wid_eff_arr(1:i))];
+            disp(['i=',num2str(i)])
+            disp(z_arr)
+        end
+    else
+        num_pts_each_layer(i) = fix(wid_eff_arr(i)/DL2) + 1;
+        z_arr = [z_arr, sum(wid_eff_arr(1:i-1)):DL2:sum(wid_eff_arr(1:i))];
+        disp(['i=',num2str(i)])
+        disp(z_arr)
+    end
+end
+
+num_eq = sum(num_pts_each_layer);
+
+k = 2*pi;
+
+A = zeros(num_eq);
+b = zeros(num_eq, 1);
+
+Uin = @(z) exp(-1j*k.*z);
+
+alpha_in = -1j*k;
+alpha_s  = 1j*k;
+
+intN1N1_1 = DL1/3;
+intN1N2_1 = DL1/6;
+intN2N2_1 = DL1/3;
+
+intN1N1_2 = DL2/3;
+intN1N2_2 = DL2/6;
+intN2N2_2 = DL2/3;
+
+off_diag_1 = -1/DL1 - k^2*intN1N2_1;
+diag_1 = 2/DL1 - k^2*(intN1N1_1 + intN2N2_1);
+
+off_diag_2 = -1/DL2 - (k*n)^2*intN1N2_2;
+diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
+
+id_eq =1;
+A(1,[1 2]) = [(diag_1/2+alpha_s) off_diag_1];
+for i = 2:(num_pts_each_layer(1)-1)
+    id_eq = id_eq + 1;
+    A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
+end
+id_eq = id_eq+1;
+A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
+b(id_eq) = -alpha_in;
+
+for id_obj = 2:(num_objs_eff-1)
+    if n_obj_eff_arr(id_obj) ~= 1
+        id_eq = id_eq+1;
+        A(id_eq, [id_eq-1 id_eq]) = [-1 1];
+        b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
+        for i = 2:num_pts_each_layer(id_obj)-1
+            id_eq = id_eq + 1;
+            A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_2 diag_2 off_diag_2];
+        end
+        id_eq = id_eq+1;
+        A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_2 diag_2/2 diag_1/2 off_diag_1];
+        b(id_eq) = alpha_in;
+        
+    else
+        id_eq = id_eq+1;
+        A(id_eq, [id_eq-1 id_eq]) = [1 -1];
+        b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
+        for i = 2:num_pts_each_layer(id_obj)-1
+            id_eq = id_eq + 1;
+            A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
+        end
+        id_eq = id_eq+1;
+        A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
+        b(id_eq) = -alpha_in;
+    end
+end
+
+id_eq = id_eq+1;
+A(id_eq, [id_eq-1 id_eq]) = [1 -1];
+b(id_eq) = Uin(sum(wid_eff_arr(1:end-1)));
+for i = 2:(num_pts_each_layer(end)-1)
+    id_eq = id_eq + 1;
+    A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
+end
+id_eq = id_eq + 1;
+A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
+b(id_eq) = -alpha_in;
+
+U = (A\b)';
+
+
+
+toc
