@@ -10,7 +10,7 @@ ratio = ((sqrt(5) + 1)/2);
 num_pts = 5000;
 
 %k_vec = 0:2*pi/1000:2*pi;
-k_vec = pi:pi/100:2*pi;
+k_vec = 2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -143,23 +143,30 @@ legend('abs(U)','abs(Uin)','abs(Us)', 'refr. index') %, 'id_obj'
 
 subplot(2,1,2)
 hold on
-plot(z_arr, angle(U))
-plot(z_arr, angle(Uin_arr))
-plot(z_arr, angle(Us))
+plot(z_arr, unwrap(angle(U)));
+plot(z_arr, unwrap(angle(Uin_arr)));
+plot(z_arr, unwrap(angle(Us)));
 plot(z_arr, n_node_arr,'.')
 %plot(z_arr, id_obj_arr,'.')
 legend('phase(U)','phase(Uin)','phase(Us)', 'refr. index')
 
 figure
+subplot(2,1,1)
 hold on
 plot(z_arr, S_arr);
 plot(z_arr, Sin_arr);
 plot(z_arr, Ss_arr);
+legend('S','Sin','Ss');
+plot(z_arr, n_node_arr);
+title('Poynting vectors')
+
+subplot(2,1,2)
+hold on
 plot(z_arr, X_arr);
 plot(z_arr, Xin_arr);
 plot(z_arr, Xs_arr);
-plot(z_arr, n_node_arr)
-legend('S','Sin','Ss', 'X','Xin','Xs', 'refr. index')
+legend('X','Xin','Xs')
+title('Reactivity')
 
 function frac_k1 = k1k2split(i, n1, n2, id_obj)
     global wid_arr DL
