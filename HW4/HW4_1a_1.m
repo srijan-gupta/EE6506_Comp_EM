@@ -15,8 +15,8 @@ eps_arr = get_multilayer_eps(seq, n, eps_n);
 wid_arr = get_width(eps_arr, air_thickness, ratio);
 len = size(eps_arr');
 
-tou = @(eps1, eps2) 2*eps1 ./ (eps1 + eps2); 
-ref = @(eps1, eps2)  (eps1 - eps2) ./ (eps1 + eps2); 
+tou = @(eps1, eps2) 2*sqrt(eps1) ./ (sqrt(eps1) + sqrt(eps2)); 
+ref = @(eps1, eps2)  (sqrt(eps1) - sqrt(eps2)) ./ (sqrt(eps1) + sqrt(eps2)); 
 
 I_mat  =@(t,r) (1/t) .* [1 r; r 1;];
 delta = @(eps,wid, k) k*sqrt(eps)*wid;
