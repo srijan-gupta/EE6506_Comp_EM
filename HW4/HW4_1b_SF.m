@@ -8,7 +8,7 @@ air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 k_max = 2*pi;
 k_min = pi;
-num_pts_per_lyr = 3;
+num_pts_per_lyr = 101;
 
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
@@ -19,12 +19,12 @@ len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
 
-n_obj_arr = [1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1];
-wid_arr = get_width(n_obj_arr, air_thickness, ratio);
-wid_arr([1 2 (end-1) end]) = air_thickness;
+%n_obj_arr = [1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1];
+%wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+%wid_arr([1 2 (end-1) end]) = air_thickness;
 
-%n_obj_arr = [1 1.5];
-%wid_arr = [4 4];
+n_obj_arr = [1 1.5];
+wid_arr = [4 4];
 
 num_objs = length(n_obj_arr);
 n_obj_eff_arr = [n_obj_arr(1)];
@@ -40,26 +40,26 @@ end
 
 
 num_objs_eff = length(n_obj_eff_arr);
-num_pts_each_layer = zeros(1,num_objs_eff);
+num_pts_eff_each_lyr = zeros(1,num_objs_eff);
 z_arr = 0:DL1:wid_eff_arr(1);
-disp(z_arr)
+n_arr = ones(1,length(z_arr));
 for i = 1:num_objs_eff
     if n_obj_eff_arr(i) == 1
-        num_pts_each_layer(i) = fix(wid_eff_arr(i)/DL1) + 1;
+        num_pts_eff_each_lyr(i) = fix(wid_eff_arr(i)/DL1) + 1;
         if i>1
-            z_arr = [z_arr, sum(wid_eff_arr(1:i-1)):DL1:sum(wid_eff_arr(1:i))];
-            disp(['i=',num2str(i)])
-            disp(z_arr)
+            z_append = sum(wid_eff_arr(1:i-1)):DL1:sum(wid_eff_arr(1:i));
+            z_arr = [z_arr, z_append];
+            n_arr = [n_arr, ones(1, length(z_append))];
         end
     else
-        num_pts_each_layer(i) = fix(wid_eff_arr(i)/DL2) + 1;
-        z_arr = [z_arr, sum(wid_eff_arr(1:i-1)):DL2:sum(wid_eff_arr(1:i))];
-        disp(['i=',num2str(i)])
-        disp(z_arr)
+        num_pts_eff_each_lyr(i) = fix(wid_eff_arr(i)/DL2) + 1;
+        z_append = sum(wid_eff_arr(1:i-1)):DL2:sum(wid_eff_arr(1:i));
+        z_arr = [z_arr, z_append];
+        n_arr = [n_arr, n_obj_eff_arr(i)*ones(1, length(z_append))];
     end
 end
 
-num_eq = sum(num_pts_each_layer);
+num_eq = sum(num_pts_eff_each_lyr);
 
 k = 2*pi;
 
@@ -87,7 +87,7 @@ diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
 
 id_eq =1;
 A(1,[1 2]) = [(diag_1/2+alpha_s) off_diag_1];
-for i = 2:(num_pts_each_layer(1)-1)
+for i = 2:(num_pts_eff_each_lyr(1)-1)
     id_eq = id_eq + 1;
     A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
 end
@@ -100,7 +100,7 @@ for id_obj = 2:(num_objs_eff-1)
         id_eq = id_eq+1;
         A(id_eq, [id_eq-1 id_eq]) = [-1 1];
         b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
-        for i = 2:num_pts_each_layer(id_obj)-1
+        for i = 2:num_pts_eff_each_lyr(id_obj)-1
             id_eq = id_eq + 1;
             A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_2 diag_2 off_diag_2];
         end
@@ -112,7 +112,7 @@ for id_obj = 2:(num_objs_eff-1)
         id_eq = id_eq+1;
         A(id_eq, [id_eq-1 id_eq]) = [1 -1];
         b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
-        for i = 2:num_pts_each_layer(id_obj)-1
+        for i = 2:num_pts_eff_each_lyr(id_obj)-1
             id_eq = id_eq + 1;
             A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
         end
@@ -125,9 +125,9 @@ end
 id_eq = id_eq+1;
 A(id_eq, [id_eq-1 id_eq]) = [1 -1];
 b(id_eq) = Uin(sum(wid_eff_arr(1:end-1)));
-for i = 2:(num_pts_each_layer(end)-1)
+for i = 2:(num_pts_eff_each_lyr(end)-1)
     id_eq = id_eq + 1;
-    A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
+    A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
 end
 id_eq = id_eq + 1;
 A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
@@ -135,6 +135,21 @@ b(id_eq) = -alpha_in;
 
 U = (A\b)';
 
+Uin_arr = Uin(z_arr);
 
+figure
+subplot(2,1,1)
+hold on
+plot(z_arr, abs(U),'.')
+plot(z_arr, abs(Uin_arr))
+plot(z_arr, n_arr)
+legend('abs(U)','abs(Uin)', 'refr. index')
+
+subplot(2,1,2)
+hold on
+plot(z_arr, unwrap(angle(U)),'.');
+plot(z_arr, unwrap(angle(Uin_arr)));
+plot(z_arr, n_arr)
+legend('phase(U)','phase(Uin)', 'refr. index')
 
 toc
