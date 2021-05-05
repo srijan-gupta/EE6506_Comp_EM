@@ -8,7 +8,7 @@ air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 k_max = 2*pi;
 k_min = pi;
-num_pts_per_lyr = 501;
+num_pts_per_lyr = 101;
 
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
@@ -69,7 +69,7 @@ b = zeros(num_eq, 1);
 Uin = @(z) exp(-1j*k.*z);
 
 alpha_in = -1j*k;
-alpha_s  = 1j*k;
+alpha_s  = -1j*k;
 
 intN1N1_1 = DL1/3;
 intN1N2_1 = DL1/6;
