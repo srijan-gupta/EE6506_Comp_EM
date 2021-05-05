@@ -8,7 +8,7 @@ air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 k_max = 2*pi;
 k_min = pi;
-num_pts_per_lyr = 801;
+num_pts_per_lyr = 201;
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
 
@@ -89,52 +89,35 @@ for k_id = 1:len_vec
         %left most interface
         id_eq =1;
         A(1,[1 2]) = [(diag_1/2+alpha_s) off_diag_1];
-        for i = 2:(num_pts_eff_each_lyr(1)-1)
+        b(1) = -alpha_in*Uin(0);
+        for i = 2:(num_pts_eff_each_lyr(1))
             id_eq = id_eq + 1;
             A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
         end
-        id_eq = id_eq+1;
-        A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
-        b(id_eq) = -alpha_in;
 
         for id_obj = 2:(num_objs_eff-1)
             if n_obj_eff_arr(id_obj) ~= 1    %object made of material N
-                id_eq = id_eq+1;
-                A(id_eq, [id_eq-1 id_eq]) = [-1 1];
-                b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
-                for i = 2:num_pts_eff_each_lyr(id_obj)-1
+                for i = 1:num_pts_eff_each_lyr(id_obj)
                     id_eq = id_eq + 1;
                     A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_2 diag_2 off_diag_2];
                 end
-                id_eq = id_eq+1;
-                A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_2 diag_2/2 diag_1/2 off_diag_1];
-                b(id_eq) = alpha_in;
 
             else    %object made of air
-                id_eq = id_eq+1;
-                A(id_eq, [id_eq-1 id_eq]) = [1 -1];
-                b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
-                for i = 2:num_pts_eff_each_lyr(id_obj)-1
+                for i = 1:num_pts_eff_each_lyr(id_obj)
                     id_eq = id_eq + 1;
                     A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
                 end
-                id_eq = id_eq+1;
-                A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
-                b(id_eq) = -alpha_in;
             end
         end
-        
+         
         %right most interface
-        id_eq = id_eq+1;
-        A(id_eq, [id_eq-1 id_eq]) = [1 -1];
-        b(id_eq) = Uin(sum(wid_eff_arr(1:end-1)));
-        for i = 2:(num_pts_eff_each_lyr(end)-1)
+        for i = 1:(num_pts_eff_each_lyr(end)-1)
             id_eq = id_eq + 1;
             A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
         end
         id_eq = id_eq + 1;
         A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
-        b(id_eq) = -alpha_in;
+        b(id_eq) = -alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
 
         U = (A\(b))';
 
