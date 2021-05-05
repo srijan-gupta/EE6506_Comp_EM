@@ -135,12 +135,12 @@ for k_id = 1:len_vec
         A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
         b(id_eq) = -alpha_in;
 
-        U = (A\b)';
+        U = (A\(b))';
 
         Uin_arr = Uin(z_arr);
         
-        ref_arr(k_id) = sum(abs((U(1:10)-Uin_arr(1:10) )./Uin_arr(1:10) ))/10;
-        tau_arr(k_id) = sum(abs( U(end-9:end)./Uin_arr(1:10) ))/10;
+        ref_arr(k_id) = sum(abs((U(1:10) )./Uin_arr(1:10) ))/10;
+        tau_arr(k_id) = sum(abs( U(end-9:end)./Uin_arr(end-9:end) ))/10;
         
 end
 
