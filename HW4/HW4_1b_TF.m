@@ -9,7 +9,7 @@ ratio = ((sqrt(5) + 1)/2);
 
 num_pts = 5000;
 
-%k_vec = 0:2*pi/1000:2*pi;
+%k_vec = 0:2*pi/50:2*pi;
 k_vec = 2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
@@ -17,12 +17,12 @@ ref_arr = zeros(1,len_vec);
 
 global wid_arr DL
 
-%n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
-%wid_arr = get_width(n_obj_arr, air_thickness, ratio);
-%wid_arr([1 end]) = 2;
+n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
+wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+wid_arr([1 end]) = 2;
 
-n_obj_arr = [1 1.5];
-wid_arr = [4 4];
+%n_obj_arr = [1 1.5];
+%wid_arr = [4 4];
 
 DL = sum(wid_arr)/(num_pts-1);
 n_node_arr = zeros(1,num_pts);
