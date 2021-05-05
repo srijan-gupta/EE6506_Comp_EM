@@ -8,7 +8,7 @@ air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 k_max = 2*pi;
 k_min = pi;
-num_pts_per_lyr = 501;
+num_pts_per_lyr = 201;
 
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
@@ -19,12 +19,12 @@ len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
 
-n_obj_arr = [1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1];
-wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+%n_obj_arr = [1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1];
+%wid_arr = get_width(n_obj_arr, air_thickness, ratio);
 %wid_arr([1 2 (end-1) end]) = air_thickness;
 
-% n_obj_arr = [1 1.5];
-% wid_arr = [5 15];
+n_obj_arr = [1 1.5];
+wid_arr = [10 15];
 
 num_objs = length(n_obj_arr);
 n_obj_eff_arr = [n_obj_arr(1)];
@@ -95,9 +95,9 @@ for k_id = 1:len_vec
         end
         id_eq = id_eq+1;
         A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
-        b(id_eq) = -alpha_in;
+        b(id_eq) = -alpha_in*Uin(wid_eff_arr(1));
 
-        for id_obj = 2:(num_objs_eff-1)
+        for id_obj = 2:num_objs_eff
             if n_obj_eff_arr(id_obj) ~= 1
                 id_eq = id_eq+1;
                 A(id_eq, [id_eq-1 id_eq]) = [-1 1];
@@ -107,8 +107,12 @@ for k_id = 1:len_vec
                     A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_2 diag_2 off_diag_2];
                 end
                 id_eq = id_eq+1;
-                A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_2 diag_2/2 diag_1/2 off_diag_1];
-                b(id_eq) = alpha_in;
+                if id_obj ~= num_objs_eff
+                    A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_2 diag_2/2 diag_1/2 off_diag_1];
+                    b(id_eq) = alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
+                else
+                    A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_2 (diag_2/2-alpha_s)];
+                end
 
             else
                 id_eq = id_eq+1;
@@ -119,28 +123,21 @@ for k_id = 1:len_vec
                     A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
                 end
                 id_eq = id_eq+1;
-                A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
-                b(id_eq) = -alpha_in;
+                if id_obj ~= num_objs_eff
+                    A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
+                    b(id_eq) = -alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
+                else
+                    A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_2 (diag_2/2-alpha_s)];
+                end
             end
         end
-
-        id_eq = id_eq+1;
-        A(id_eq, [id_eq-1 id_eq]) = [1 -1];
-        b(id_eq) = Uin(sum(wid_eff_arr(1:end-1)));
-        for i = 2:(num_pts_eff_each_lyr(end)-1)
-            id_eq = id_eq + 1;
-            A(id_eq,[id_eq-1 id_eq id_eq+1]) = [off_diag_1 diag_1 off_diag_1];
-        end
-        id_eq = id_eq + 1;
-        A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
-        b(id_eq) = -alpha_in;
 
         U = (A\b)';
 
         Uin_arr = Uin(z_arr);
         
-        ref_arr(k_id) = sum(abs((U(1:10)-Uin_arr(1:10) )./Uin_arr(1:10) ))/10;
-        tau_arr(k_id) = sum(abs( U(end-9:end)./Uin_arr(1:10) ))/10;
+        ref_arr(k_id) = sum(abs( U(1:10) ))/10;
+        tau_arr(k_id) = sum(abs( U(end-9:end)+Uin_arr(end-9:end) ))/10;
         
 end
 
