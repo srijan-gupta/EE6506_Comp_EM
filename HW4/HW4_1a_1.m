@@ -1,12 +1,12 @@
 tic
 
-n = 7;
-seq =2;
+n = 1;
+seq =1;
 eps_n = 1.5^2; %relative permitivitty
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 
-k_vec = 0:2*pi/10000:10*pi;
+k_vec = 0:2*pi/1000:2*pi;
 len_vec = length(k_vec);
 tou_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
