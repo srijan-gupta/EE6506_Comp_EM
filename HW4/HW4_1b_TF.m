@@ -6,10 +6,12 @@ eps_r = 3.5^2; %relative permitivitty
 n = eps_r^0.5; %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
+k_max = 2*pi;
+k_min = 0;
 
 num_pts = 1000;
 
-%k_vec = 0:2*pi/50:2*pi;
+k_vec = k_min:(k_max-k_min)/500:k_max;
 k_vec = 0.6*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
@@ -45,8 +47,8 @@ for k_id = 1:len_vec
     Uin = @(x) exp(-1j*k.*x);
     
     alpha_in = -1j*k;
-    alpha_left = 1j*k;
-    alpha_right = -1j*k;
+    alpha_left = -1j*k;
+    alpha_right = 1j*k;
     
     A = zeros(num_pts);
     b = zeros(num_pts, 1);
@@ -134,12 +136,12 @@ Xin_arr = 0.5*imag(Uin_arr.*conj(cmu_Hin_arr));
 X_arr = 0.5*imag(U.*conj(cmu_H_arr));
 Xs_arr = 0.5*imag(Us.*conj(cmu_Hs_arr));
 
-figure
-hold on
-plot(z_arr, n_node_arr, '.')
-plot(z_arr, id_obj_arr,'.')
-plot(z_arr, 10*f_arr,'.')
-legend('n','id_obj','10*f')
+% figure
+% hold on
+% plot(z_arr, n_node_arr, '.')
+% plot(z_arr, id_obj_arr,'.')
+% plot(z_arr, 10*f_arr,'.')
+% legend('n','id_obj','10*f')
 
 figure
 subplot(2,2,1)

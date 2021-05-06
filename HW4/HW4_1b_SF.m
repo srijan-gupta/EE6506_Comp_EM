@@ -16,7 +16,6 @@ DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
 
 % The vector with k values
-%k_vec = 0:2*pi/20:2*pi;
 %k_vec = k_min:(k_max-k_min)/500:k_max;
 k_vec = 2*pi;
 len_vec = length(k_vec);
@@ -99,7 +98,8 @@ for k_id = 1:len_vec
         alpha_in = -1j*k;
         alpha_s_l  = -1j*k;
         alpha_s_r = 1j*k;
-
+        
+        % Defining equations
         id_eq =1;
         A(1,[1 2]) = [(diag_1/2+alpha_s_l) off_diag_1];
         for i = 2:(num_pts_eff_each_lyr(1)-1)
@@ -109,9 +109,9 @@ for k_id = 1:len_vec
         id_eq = id_eq+1;
         A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
         b(id_eq) = -alpha_in*Uin(wid_eff_arr(1));
-
+        
         for id_obj = 2:num_objs_eff
-            if n_obj_eff_arr(id_obj) ~= 1
+            if n_obj_eff_arr(id_obj) ~= 1 % medium
                 id_eq = id_eq+1;
                 A(id_eq, [id_eq-1 id_eq]) = [-1 1];
                 b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
@@ -123,11 +123,11 @@ for k_id = 1:len_vec
                 if id_obj ~= num_objs_eff
                     A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_2 diag_2/2 diag_1/2 off_diag_1];
                     b(id_eq) = alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
-                else
+                else % last layer
                     A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_2 (diag_2/2-alpha_s)];
                 end
 
-            else
+            else % air
                 id_eq = id_eq+1;
                 A(id_eq, [id_eq-1 id_eq]) = [1 -1];
                 b(id_eq) = Uin(sum(wid_eff_arr(1:id_obj-1)));
@@ -139,26 +139,31 @@ for k_id = 1:len_vec
                 if id_obj ~= num_objs_eff
                     A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
                     b(id_eq) = -alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
-                else
+                else % last layer
                     A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s_r)];
                 end
             end
         end
-
+        
+        % Solving the equations
         U = (A\b)';
-
+        
+        % Calculating Uin
         Uin_arr = Uin(z_arr);
         
+        % Reflection and transmission coefficients
         ref_arr(k_id) = sum(abs( U(1:10) ))/10;
         tau_arr(k_id) = sum(abs( U(end-9:end)+Uin_arr(end-9:end) ))/10;
         
 end
 
+% U total in the first and last layers
 U_tot_first_lyr = U(1:num_pts_eff_each_lyr(1)) + Uin_arr(1:num_pts_eff_each_lyr(1));
 U_tot_last_lyr  = U(end-num_pts_eff_each_lyr(end)+1:end) + Uin_arr(end-num_pts_eff_each_lyr(end)+1:end);
 U_tot_bndry_lyrs = [U_tot_first_lyr U_tot_last_lyr];
 z_arr_bndry_lyrs = [z_arr(1:num_pts_eff_each_lyr(1)) z_arr(end-num_pts_eff_each_lyr(end)+1:end)];
 
+% Plotting ref. and trans. coefficients
 figure;
 hold on;
 plot(k_vec, tau_arr);
@@ -169,7 +174,9 @@ xlabel('k')
 hold off;
 legend("transmission","reflection");
 
+% Plotting fields
 figure
+% Magnitude
 subplot(2,1,1)
 hold on
 plot(z_arr, abs(U),'.')
@@ -178,6 +185,7 @@ plot(z_arr_bndry_lyrs, abs(U_tot_bndry_lyrs),'.');
 plot(z_arr, n_arr)
 legend('abs(U)','abs(Uin)', 'U tot. bndry', 'refr. index')
 
+% Phase
 subplot(2,1,2)
 hold on
 plot(z_arr, (angle(U)),'.');
