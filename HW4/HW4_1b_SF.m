@@ -1,7 +1,7 @@
 tic
 
 % Defining the parameters
-n_layers = 1;
+n_layers = 7;
 seq =1;
 eps_r = 3.5^2; %relative permitivitty
 n = sqrt(eps_r); %refractive index
@@ -76,12 +76,6 @@ intN1N1_2 = DL2/3;
 intN1N2_2 = DL2/6;
 intN2N2_2 = DL2/3;
 
-off_diag_1 = -1/DL1 - k^2*intN1N2_1;
-diag_1 = 2/DL1 - k^2*(intN1N1_1 + intN2N2_1);
-
-off_diag_2 = -1/DL2 - (k*n)^2*intN1N2_2;
-diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
-
 % Running the loop over k
 for k_id = 1:len_vec
  
@@ -98,6 +92,12 @@ for k_id = 1:len_vec
         alpha_in = -1j*k;
         alpha_s_l  = -1j*k;
         alpha_s_r = 1j*k;
+        
+        off_diag_1 = -1/DL1 - k^2*intN1N2_1;
+        diag_1 = 2/DL1 - k^2*(intN1N1_1 + intN2N2_1);
+
+        off_diag_2 = -1/DL2 - (k*n)^2*intN1N2_2;
+        diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
         
         % Defining equations
         id_eq =1;
