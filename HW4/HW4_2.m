@@ -1,6 +1,6 @@
-pt1 = [1.11, 2.1]; 
-pt2 = [3.25, 3.3]; 
-pt3 = [2.5, 1.5];
+pt1 = [0,0]; 
+pt2 = [1,0]; 
+pt3 = [0,1];
 pt_arr = [pt1; pt2; pt3];
 
 L1 = scalar_basis(pt_arr);
@@ -38,7 +38,21 @@ for i=1:3
         end
 end
 
-A = A .* det(J); 
-B = B .* det(J);
+A = A .* det(J) 
+B = B .* det(J)
 
+%validating the basis functions
+x = [0:0.1:6];
+y = [0:0.1:6];
+[X,Y] = meshgrid(x,y);
+Z1 = L_xy(X,Y,L1);
+surf(X,Y,Z1);
+hold on;
+Z2 = L_xy(X,Y,L2);
+surf(X,Y,Z2);
+Z3 = L_xy(X,Y,L3);
+surf(X,Y,Z3);
+xlim([0 max(pt_arr(:,1))]);
+ylim([0 max(pt_arr(:,2))]);
+zlim([0 1]);
 
