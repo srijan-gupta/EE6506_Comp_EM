@@ -2,7 +2,7 @@ tic
 
 n_layers = 7;
 seq =1;
-eps_r = 1.5^2; %relative permitivitty
+eps_r = 3.5^2; %relative permitivitty
 n = sqrt(eps_r); %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);

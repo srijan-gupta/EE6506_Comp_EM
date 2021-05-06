@@ -1,5 +1,6 @@
 tic
 
+% Defining the parameters
 n_layers = 1;
 seq =1;
 eps_r = 3.5^2; %relative permitivitty
@@ -10,23 +11,26 @@ k_max = 2*pi;
 k_min = 0;
 num_pts_per_lyr = 201;
 
+% Discretization lengths for air and medium
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
 
+% The vector with k values
 %k_vec = 0:2*pi/20:2*pi;
 %k_vec = k_min:(k_max-k_min)/500:k_max;
 k_vec = 2*pi;
 len_vec = length(k_vec);
+
+% Initializing arrays to store ref. and trans. coefficients
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
 
+% Defining the ref. inde array and the corresponding widths
 n_obj_arr = [1 1 1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1 1 1];
 wid_arr = get_width(n_obj_arr, air_thickness, ratio);
 wid_arr([1 2 3 4 (end-3) (end-2) (end-1) end]) = air_thickness;
 
-%n_obj_arr = [1 1.5];
-%wid_arr = [10 15];
-
+% Combining consecutive objects with the same ref. index (i.e. treating as one, and updating width)
 num_objs = length(n_obj_arr);
 n_obj_eff_arr = [n_obj_arr(1)];
 wid_eff_arr = [wid_arr(1)];
@@ -38,9 +42,10 @@ for i = 2:num_objs
         wid_eff_arr(end+1) = wid_arr(i);
     end
 end
-
-
 num_objs_eff = length(n_obj_eff_arr);
+
+% Effective number of points in each layer, array with position values,
+% array with corresponding n values
 num_pts_eff_each_lyr = zeros(1,num_objs_eff);
 z_arr = 0:DL1:wid_eff_arr(1);
 n_arr = ones(1,length(z_arr));
@@ -60,34 +65,40 @@ for i = 1:num_objs_eff
     end
 end
 
+% Number of equations
 num_eq = sum(num_pts_eff_each_lyr);
 
+% Precomputing a few quantities
+intN1N1_1 = DL1/3; %integral(N1*N1) for \Delta = DL1
+intN1N2_1 = DL1/6;
+intN2N2_1 = DL1/3;
+
+intN1N1_2 = DL2/3;
+intN1N2_2 = DL2/6;
+intN2N2_2 = DL2/3;
+
+off_diag_1 = -1/DL1 - k^2*intN1N2_1;
+diag_1 = 2/DL1 - k^2*(intN1N1_1 + intN2N2_1);
+
+off_diag_2 = -1/DL2 - (k*n)^2*intN1N2_2;
+diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
+
+% Running the loop over k
 for k_id = 1:len_vec
  
         k = k_vec(k_id);
         
+        % Initialising
         A = zeros(num_eq);
         b = zeros(num_eq, 1);
-
+        
+        % The incident field as a function of position
         Uin = @(z) exp(-1j*k.*z);
-
+        
+        % alpha values
         alpha_in = -1j*k;
         alpha_s_l  = -1j*k;
         alpha_s_r = 1j*k;
-
-        intN1N1_1 = DL1/3;
-        intN1N2_1 = DL1/6;
-        intN2N2_1 = DL1/3;
-
-        intN1N1_2 = DL2/3;
-        intN1N2_2 = DL2/6;
-        intN2N2_2 = DL2/3;
-
-        off_diag_1 = -1/DL1 - k^2*intN1N2_1;
-        diag_1 = 2/DL1 - k^2*(intN1N1_1 + intN2N2_1);
-
-        off_diag_2 = -1/DL2 - (k*n)^2*intN1N2_2;
-        diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
 
         id_eq =1;
         A(1,[1 2]) = [(diag_1/2+alpha_s_l) off_diag_1];

@@ -1,7 +1,7 @@
 lambda_ref = 1e9;
 n = 7;
 seq =1;
-eps_n = 12.25;
+eps_n = 3.5^2;
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
         

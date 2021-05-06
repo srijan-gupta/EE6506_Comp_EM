@@ -2,7 +2,7 @@ tic
 
 n = 1;
 seq =1;
-eps_n = 1.5^2; %relative permitivitty
+eps_n = 3.5^2; %relative permitivitty
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 
