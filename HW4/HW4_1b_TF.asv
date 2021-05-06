@@ -45,7 +45,7 @@ for k_id = 1:len_vec
     Uin = @(x) exp(-1j*k.*x);
     
     alpha_in = -1j*k;
-    alpha = 1j*k;
+    alpha = @(n) 1j*k*n;
     
     A = zeros(num_pts);
     b = zeros(num_pts, 1);
@@ -55,9 +55,9 @@ for k_id = 1:len_vec
     id_obj_arr(1) = id_obj;
     
     n = n_node_arr(1);
-    A(1,1) = 1/DL - (k*n)^2*intN1N1(0,DL) + alpha;
+    A(1,1) = 1/DL - (k*n)^2*intN1N1(0,DL) + alpha(n);
     A(1,2) = -1/DL - (k*n)^2*intN1N2(0,DL);
-    b(1) = -(alpha_in - alpha);
+    b(1) = -(alpha_in - alpha(n));
     
     f_arr = zeros(1,num_pts);
     f = 1;
@@ -91,8 +91,8 @@ for k_id = 1:len_vec
     
     n = n_node_arr(end);
     A(num_pts,num_pts-1) = -1/DL - (k*n)^2*intN1N2(0,DL);
-    A(num_pts,num_pts) = 1/DL - (k*n)^2*intN2N2(0,DL) - alpha;
-    b(end) = (alpha_in - alpha)*Uin(sum(wid_arr));
+    A(num_pts,num_pts) = 1/DL - (k*n)^2*intN2N2(0,DL) - alpha(n);
+    b(end) = (alpha_in - alpha(n))*Uin(sum(wid_arr));
     
     id_obj_arr(end) = id_obj;
     

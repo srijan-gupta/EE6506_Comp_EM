@@ -127,7 +127,7 @@ for k_id = 1:len_vec
                     A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
                     b(id_eq) = -alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
                 else
-                    A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_2 (diag_2/2-alpha_s)];
+                    A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
                 end
             end
         end
