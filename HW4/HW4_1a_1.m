@@ -1,12 +1,12 @@
 tic
 
 n = 7;    %number of layers
-seq =1;  %choose structure 1 or 2
+seq =1;  %choose structure 1 or 
 eps_n = 3.5^2; %relative permitivitty
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);    %ratio of thicknesses of material layer and air gap
-
 k_vec = 0:2*pi/1000:2*pi;  %sweep k instead of lambda to check for periodicity
+
 len_vec = length(k_vec);
 tou_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);

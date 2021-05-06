@@ -1,15 +1,17 @@
 tic
 
-n_layers = 7;
+n_layers = 1;
 seq =1;
 eps_r = 3.5^2; %relative permitivitty
 n = eps_r^0.5; %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
+k_max = 2*pi;
+k_min = 0;
 
-num_pts = 3000;
+num_pts = 1000;
 
-%k_vec = 0:2*pi/50:2*pi;
+k_vec = k_min:(k_max-k_min)/500:k_max;
 k_vec = 0.6*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
@@ -20,9 +22,6 @@ global wid_arr DL
 n_obj_arr = [1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1];
 wid_arr = get_width(n_obj_arr, air_thickness, ratio);
 wid_arr([1 end]) = 2;
-
-%n_obj_arr = [1 1.5];
-%wid_arr = [4 4];
 
 DL = sum(wid_arr)/(num_pts-1);
 n_node_arr = zeros(1,num_pts);
@@ -48,7 +47,8 @@ for k_id = 1:len_vec
     Uin = @(x) exp(-1j*k.*x);
     
     alpha_in = -1j*k;
-    alpha = @(n) 1j*k*n;
+    alpha_left = -1j*k;
+    alpha_right = 1j*k;
     
     A = zeros(num_pts);
     b = zeros(num_pts, 1);
@@ -58,9 +58,9 @@ for k_id = 1:len_vec
     id_obj_arr(1) = id_obj;
     
     n = n_node_arr(1);
-    A(1,1) = 1/DL - (k*n)^2*intN1N1(0,DL) + alpha(n);
+    A(1,1) = 1/DL - (k*n)^2*intN1N1(0,DL) + alpha_left;
     A(1,2) = -1/DL - (k*n)^2*intN1N2(0,DL);
-    b(1) = -(alpha_in - alpha(n));
+    b(1) = -(alpha_in - alpha_left);
     
     f_arr = zeros(1,num_pts);
     f = 1;
@@ -94,8 +94,8 @@ for k_id = 1:len_vec
     
     n = n_node_arr(end);
     A(num_pts,num_pts-1) = -1/DL - (k*n)^2*intN1N2(0,DL);
-    A(num_pts,num_pts) = 1/DL - (k*n)^2*intN2N2(0,DL) - alpha(n);
-    b(end) = (alpha_in - alpha(n))*Uin(sum(wid_arr));
+    A(num_pts,num_pts) = 1/DL - (k*n)^2*intN2N2(0,DL) - alpha_right;
+    b(end) = (alpha_in - alpha_right)*Uin(sum(wid_arr));
     
     id_obj_arr(end) = id_obj;
     
@@ -136,12 +136,12 @@ Xin_arr = 0.5*imag(Uin_arr.*conj(cmu_Hin_arr));
 X_arr = 0.5*imag(U.*conj(cmu_H_arr));
 Xs_arr = 0.5*imag(Us.*conj(cmu_Hs_arr));
 
-figure
-hold on
-plot(z_arr, n_node_arr, '.')
-plot(z_arr, id_obj_arr,'.')
-plot(z_arr, 10*f_arr,'.')
-legend('n','id_obj','10*f')
+% figure
+% hold on
+% plot(z_arr, n_node_arr, '.')
+% plot(z_arr, id_obj_arr,'.')
+% plot(z_arr, 10*f_arr,'.')
+% legend('n','id_obj','10*f')
 
 figure
 subplot(2,2,1)

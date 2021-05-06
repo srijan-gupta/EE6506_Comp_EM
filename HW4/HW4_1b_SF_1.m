@@ -1,19 +1,19 @@
 tic
 
-n_layers = 7;
+n_layers = 1;
 seq =1;
 eps_r = 3.5^2; %relative permitivitty
 n = sqrt(eps_r); %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
-k_max = 0.6*pi;
-k_min = pi;
+k_max = 2*pi;
+k_min = 0;
 num_pts_per_lyr = 201;
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
 
-%k_vec = 0:2*pi/20:2*pi;
-k_vec = 2*pi;
+k_vec = k_min:(k_max-k_min)/500:k_max;
+%k_vec = 2*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -89,7 +89,6 @@ for k_id = 1:len_vec
         %left most interface
         id_eq =1;
         A(1,[1 2]) = [(diag_1/2+alpha_s) off_diag_1];
-        b(1) = -alpha_in*Uin(0);
         for i = 2:(num_pts_eff_each_lyr(1))
             id_eq = id_eq + 1;
             A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
@@ -117,14 +116,13 @@ for k_id = 1:len_vec
         end
         id_eq = id_eq + 1;
         A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
-        b(id_eq) = -alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
 
         U = (A\(b))';
 
         Uin_arr = Uin(z_arr);
         
-        ref_arr(k_id) = sum(abs((U(1:10) )./Uin_arr(1:10) ))/10;
-        tau_arr(k_id) = sum(abs( U(end-9:end)./Uin_arr(end-9:end) ))/10;
+        ref_arr(k_id) = sum(abs( U(1:10) ))/10;
+        tau_arr(k_id) = sum(abs( U(end-9:end)+Uin_arr(end-9:end) ))/10;
         
 end
 
