@@ -4,12 +4,12 @@ function [eps_arr] = get_multilayer_eps(seq, n, eps_n)
         %assumes only 2 materials: material N and Air
         
         eps_arr = [];
-        if seq == 1
+        if seq == 1    %alternate arrangement
                 for i = 1:n-1
                         eps_arr(end+1:end+2) = [eps_n 1];
                 end
                 eps_arr(end+1) = eps_n;         
-        else
+        else    %fibonocci arrangement
                 f1 = [1];
                 f2 = [eps_n];
                 if n == 1

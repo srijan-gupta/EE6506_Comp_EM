@@ -2,11 +2,11 @@ tic
 
 n_layers = 7;
 seq =1;
-eps_r = 1.5^2; %relative permitivitty
+eps_r = 3.5^2; %relative permitivitty
 n = sqrt(eps_r); %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
-k_max = 2*pi;
+k_max = 0.6*pi;
 k_min = pi;
 num_pts_per_lyr = 201;
 DL1 = air_thickness/(num_pts_per_lyr-1);
