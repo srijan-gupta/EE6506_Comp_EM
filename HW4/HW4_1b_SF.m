@@ -1,30 +1,30 @@
 tic
 
-n_layers = 7;
+n_layers = 1;
 seq =1;
-eps_r = 1.5^2; %relative permitivitty
+eps_r = 3.5^2; %relative permitivitty
 n = sqrt(eps_r); %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 k_max = 2*pi;
 k_min = pi;
-num_pts_per_lyr = 201;
+num_pts_per_lyr = 21;
 
 DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
 
 %k_vec = 0:2*pi/20:2*pi;
-k_vec = 2*pi;
+k_vec = 0.6*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
 
-%n_obj_arr = [1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1];
-%wid_arr = get_width(n_obj_arr, air_thickness, ratio);
-%wid_arr([1 2 (end-1) end]) = air_thickness;
+n_obj_arr = [1 1 1 1 (get_multilayer_eps(seq, n_layers, eps_r)).^0.5 1 1 1 1];
+wid_arr = get_width(n_obj_arr, air_thickness, ratio);
+wid_arr([1 2 3 4 (end-3) (end-2) (end-1) end]) = air_thickness;
 
-n_obj_arr = [1 1.5];
-wid_arr = [10 15];
+%n_obj_arr = [1 1.5];
+%wid_arr = [10 15];
 
 num_objs = length(n_obj_arr);
 n_obj_eff_arr = [n_obj_arr(1)];
@@ -71,7 +71,8 @@ for k_id = 1:len_vec
         Uin = @(z) exp(-1j*k.*z);
 
         alpha_in = -1j*k;
-        alpha_s  = 1j*k;
+        alpha_s_left  = 1j*k;
+        alpha_s_right = -1j*k;
 
         intN1N1_1 = DL1/3;
         intN1N2_1 = DL1/6;
@@ -88,7 +89,7 @@ for k_id = 1:len_vec
         diag_2 = 2/DL2 - (k*n)^2*(intN1N1_2 + intN2N2_2);
 
         id_eq =1;
-        A(1,[1 2]) = [(diag_1/2+alpha_s) off_diag_1];
+        A(1,[1 2]) = [(diag_1/2+alpha_s_left) off_diag_1];
         for i = 2:(num_pts_eff_each_lyr(1)-1)
             id_eq = id_eq + 1;
             A(i,[i-1 i i+1]) = [off_diag_1 diag_1 off_diag_1];
@@ -127,7 +128,7 @@ for k_id = 1:len_vec
                     A(id_eq, [(id_eq-1) (id_eq) (id_eq+1) (id_eq+2)]) = [off_diag_1 diag_1/2 diag_2/2 off_diag_2];
                     b(id_eq) = -alpha_in*Uin(sum(wid_eff_arr(1:id_obj)));
                 else
-                    A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s)];
+                    A(id_eq, [(id_eq-1) (id_eq)]) = [off_diag_1 (diag_1/2-alpha_s_right)];
                 end
             end
         end
@@ -140,6 +141,11 @@ for k_id = 1:len_vec
         tau_arr(k_id) = sum(abs( U(end-9:end)+Uin_arr(end-9:end) ))/10;
         
 end
+
+U_tot_first_lyr = U(1:num_pts_eff_each_lyr(1)) + Uin_arr(1:num_pts_eff_each_lyr(1));
+U_tot_last_lyr  = U(end-num_pts_eff_each_lyr(end)+1:end) + Uin_arr(end-num_pts_eff_each_lyr(end)+1:end);
+U_tot_bndry_lyrs = [U_tot_first_lyr U_tot_last_lyr];
+z_arr_bndry_lyrs = [z_arr(1:num_pts_eff_each_lyr(1)) z_arr(end-num_pts_eff_each_lyr(end)+1:end)];
 
 figure;
 hold on;
@@ -156,14 +162,16 @@ subplot(2,1,1)
 hold on
 plot(z_arr, abs(U),'.')
 plot(z_arr, abs(Uin_arr))
+plot(z_arr_bndry_lyrs, abs(U_tot_bndry_lyrs),'.');
 plot(z_arr, n_arr)
-legend('abs(U)','abs(Uin)', 'refr. index')
+legend('abs(U)','abs(Uin)', 'U tot. bndry', 'refr. index')
 
 subplot(2,1,2)
 hold on
 plot(z_arr, unwrap(angle(U)),'.');
 plot(z_arr, unwrap(angle(Uin_arr)));
+plot(z_arr_bndry_lyrs, unwrap(angle(U_tot_bndry_lyrs)),'.');
 plot(z_arr, n_arr)
-legend('phase(U)','phase(Uin)', 'refr. index')
+legend('phase(U)','phase(Uin)', 'U tot. bndry', 'refr. index')
 
 toc
