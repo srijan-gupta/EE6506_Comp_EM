@@ -2,15 +2,15 @@ tic
 
 n_layers = 7;
 seq =1;
-eps_r = 1.5^2; %relative permitivitty
+eps_r = 3.5^2; %relative permitivitty
 n = eps_r^0.5; %refractive index
 air_thickness = 1;
 ratio = ((sqrt(5) + 1)/2);
 
-num_pts = 5000;
+num_pts = 3000;
 
 %k_vec = 0:2*pi/50:2*pi;
-k_vec = 2*pi;
+k_vec = 0.6*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
