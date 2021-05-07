@@ -1,6 +1,6 @@
 tic
 
-n_layers = 1;
+n_layers = 7;
 seq =1;
 eps_r = 3.5^2; %relative permitivitty
 n = eps_r^0.5; %refractive index
@@ -12,7 +12,7 @@ k_min = 0;
 num_pts = 1000;
 
 k_vec = k_min:(k_max-k_min)/500:k_max;
-k_vec = 0.6*pi;
+%k_vec = 0.6*pi;
 len_vec = length(k_vec);
 tau_arr = zeros(1,len_vec);
 ref_arr = zeros(1,len_vec);
@@ -151,6 +151,7 @@ plot(z_arr, abs(Uin_arr))
 plot(z_arr, abs(Us))
 plot(z_arr, n_node_arr)
 legend('abs(U)','abs(Uin)','abs(Us)', 'refr. index')
+title('Electric fields: magnitude')
 
 subplot(2,2,3)
 hold on
@@ -159,6 +160,7 @@ plot(z_arr, unwrap(angle(Uin_arr)));
 plot(z_arr, unwrap(angle(Us)));
 plot(z_arr, n_node_arr)
 legend('phase(U)','phase(Uin)','phase(Us)', 'refr. index')
+title('Electric fields: phase')
 
 subplot(2,2,2)
 hold on
@@ -167,6 +169,7 @@ plot(z_arr, abs(cmu_Hin_arr))
 plot(z_arr, abs(cmu_Hs_arr))
 plot(z_arr, n_node_arr)
 legend('abs(c\muH)','abs(c\muHin)','abs(c\muHs)', 'refr. index')
+title('Magnetic fields: magnitude')
 
 subplot(2,2,4)
 hold on
@@ -175,6 +178,7 @@ plot(z_arr, unwrap(angle(cmu_Hin_arr)));
 plot(z_arr, unwrap(angle(cmu_Hs_arr)));
 plot(z_arr, n_node_arr)
 legend('phase(c\muH)','phase(c\muHin)','phase(c\muHs)', 'refr. index')
+title('Magnetic fields: phase')
 
 figure
 subplot(2,1,1)

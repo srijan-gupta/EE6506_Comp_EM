@@ -2,7 +2,7 @@ tic
 
 % Defining the parameters
 n_layers = 7;
-seq =1;
+seq =2;
 eps_r = 3.5^2; %relative permitivitty
 n = sqrt(eps_r); %refractive index
 air_thickness = 1;
@@ -16,8 +16,8 @@ DL1 = air_thickness/(num_pts_per_lyr-1);
 DL2 = ratio*air_thickness/(num_pts_per_lyr-1);
 
 % The vector with k values
-%k_vec = k_min:(k_max-k_min)/500:k_max;
-k_vec = 2*pi;
+k_vec = k_min:(k_max-k_min)/500:k_max;
+%k_vec = 2*pi;
 len_vec = length(k_vec);
 
 % Initializing arrays to store ref. and trans. coefficients
