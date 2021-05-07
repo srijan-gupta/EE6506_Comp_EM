@@ -7,9 +7,9 @@ function [wid_arr] = get_width(eps_arr,wid, ratio)
          wid_arr = zeros(size(eps_arr));
          for i = 1 : size(eps_arr')
                  if eps_arr(i) == 1 
-                         wid_arr(i) = wid_a;
+                         wid_arr(i) = wid_a;    %set width of air gap
                  else
-                         wid_arr(i) = wid_n;
+                         wid_arr(i) = wid_n;    %set width of material layer
                  end
          end        
          
